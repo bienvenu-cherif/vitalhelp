@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Analyse du {{ analyse.created_at.strftime('%d/%m/%Y') }} — VitalHelp{% endblock %}
+
+{% block content %}
+<div class="container">
+  <a href="{{ url_for('analyse.index') }}" class="back-link" style="color:var(--text-muted);text-decoration:none">← Retour</a>
+  <header class="page-header">
+    <span class="page-eyebrow">Analyse archivée</span>
+    <h1>{{ analyse.created_at.strftime('%d %B %Y') }}</h1>
+    <p class="text-muted">{{ analyse.created_at.strftime('%H:%M') }} · {{ analyse.nb_mesures_analysees }} mesures · {{ analyse.modele_utilise }}</p>
+  </header>
+
+  <div class="ai-grid">
+    <div class="ai-score-card">
+      <small>SCORE GLOBAL</small>
+      <div class="ai-score-value {{ 'good' if analyse.score_global >= 75 else ('avg' if analyse.score_global >= 50 else 'bad') }}">
+        {{ analyse.score_global }}
+      </div>
+      <div class="ai-score-suffix">sur 100</div>
+      <p class="ai-resume">{{ analyse.resume }}</p>
+    </div>
+
+    <div class="ai-card">
+      <div class="ai-card-head"><div class="ai-icon">📋</div><h3>Interprétation</h3></div>
+      <p class="ai-text">{{ analyse.interpretation }}</p>
+    </div>
+
+    <div class="ai-card ai-card-risk">
+      <div class="ai-card-head"><div class="ai-icon ai-icon-danger">⚠️</div><h3>Risques</h3></div>
+      <ul class="ai-list">
+        {% for r in analyse.risques %}<li>{{ r }}</li>{% endfor %}
+      </ul>
+    </div>
+
+    <div class="ai-card ai-card-reco">
+      <div class="ai-card-head"><div class="ai-icon ai-icon-success">💡</div><h3>Recommandations</h3></div>
+      <ol class="ai-reco-list">
+        {% for r in analyse.recommandations %}<li><span class="num">{{ loop.index }}</span><span>{{ r }}</span></li>{% endfor %}
+      </ol>
+    </div>
+  </div>
+</div>
+{% endblock %}

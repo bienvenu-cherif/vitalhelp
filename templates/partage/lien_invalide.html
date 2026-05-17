@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lien invalide — VitalHelp</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="public-page">
+  <div class="public-bg"></div>
+  <main class="public-main" style="display:grid;place-items:center;min-height:100vh">
+    <div class="glass-card" style="text-align:center;padding:3rem;max-width:480px">
+      <div style="font-size:3rem;margin-bottom:1rem">🔒</div>
+      <h1>Accès impossible</h1>
+      <p class="text-muted" style="margin-top:1rem">{{ raison }}</p>
+      <p class="text-muted" style="margin-top:2rem;font-size:0.85rem">
+        Le patient peut générer un nouveau lien depuis son espace VitalHelp.
+      </p>
+    </div>
+  </main>
+</body>
+</html>

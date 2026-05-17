@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Nouvelle mesure — VitalHelp{% endblock %}
+
+{% block content %}
+<div class="container container-narrow">
+  <header class="page-header">
+    <span class="page-eyebrow">Saisie</span>
+    <h1>Nouvelle mesure</h1>
+    <p class="text-muted">Saisissez les valeurs disponibles. Tous les champs sont optionnels.</p>
+  </header>
+
+  <div class="card">
+    <form method="POST" novalidate>
+      {{ form.hidden_tag() }}
+      <div class="form-row">
+        <div class="form-group">
+          {{ form.poids_kg.label }}
+          {{ form.poids_kg(class="input", step="0.1", placeholder="ex: 72.4") }}
+          {% for e in form.poids_kg.errors %}<span class="error">{{ e }}</span>{% endfor %}
+        </div>
+        <div class="form-group">
+          {{ form.freq_cardiaque.label }}
+          {{ form.freq_cardiaque(class="input", placeholder="ex: 68") }}
+          {% for e in form.freq_cardiaque.errors %}<span class="error">{{ e }}</span>{% endfor %}
+        </div>
+        <div class="form-group">
+          {{ form.tension_sys.label }}
+          {{ form.tension_sys(class="input", placeholder="ex: 118") }}
+          {% for e in form.tension_sys.errors %}<span class="error">{{ e }}</span>{% endfor %}
+        </div>
+        <div class="form-group">
+          {{ form.tension_dia.label }}
+          {{ form.tension_dia(class="input", placeholder="ex: 75") }}
+          {% for e in form.tension_dia.errors %}<span class="error">{{ e }}</span>{% endfor %}
+        </div>
+        <div class="form-group full">
+          {{ form.glycemie_gl.label }}
+          {{ form.glycemie_gl(class="input", step="0.01", placeholder="ex: 0.92") }}
+          {% for e in form.glycemie_gl.errors %}<span class="error">{{ e }}</span>{% endfor %}
+        </div>
+        <div class="form-group full">
+          {{ form.note.label }}
+          {{ form.note(class="input", rows="2", placeholder="Contexte, ressenti...") }}
+        </div>
+      </div>
+      <div class="form-actions">
+        <a href="{{ url_for('mesures.liste') }}" class="btn btn-outline">Annuler</a>
+        {{ form.submit(class="btn btn-primary") }}
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

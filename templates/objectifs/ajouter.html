@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Nouvel objectif — VitalHelp{% endblock %}
+
+{% block content %}
+<div class="container container-narrow">
+  <header class="page-header">
+    <span class="page-eyebrow">Nouvel objectif</span>
+    <h1>Fixer une cible</h1>
+    <p class="text-muted">Définissez où vous voulez arriver — VitalHelp suivra votre progression.</p>
+  </header>
+  <div class="card">
+    <form method="POST" novalidate>
+      {{ form.hidden_tag() }}
+      <div class="form-row">
+        <div class="form-group full">
+          {{ form.titre.label }}
+          {{ form.titre(class="input", placeholder="Perdre 5 kg en 3 mois") }}
+          {% for e in form.titre.errors %}<span class="error">{{ e }}</span>{% endfor %}
+        </div>
+        <div class="form-group full">
+          {{ form.type_indicateur.label }}
+          {{ form.type_indicateur(class="input") }}
+        </div>
+        <div class="form-group">
+          {{ form.valeur_depart.label }}
+          {{ form.valeur_depart(class="input", step="0.01") }}
+          {% for e in form.valeur_depart.errors %}<span class="error">{{ e }}</span>{% endfor %}
+        </div>
+        <div class="form-group">
+          {{ form.valeur_cible.label }}
+          {{ form.valeur_cible(class="input", step="0.01") }}
+          {% for e in form.valeur_cible.errors %}<span class="error">{{ e }}</span>{% endfor %}
+        </div>
+        <div class="form-group full">
+          {{ form.deadline.label }}
+          {{ form.deadline(class="input") }}
+        </div>
+      </div>
+      <div class="form-actions">
+        <a href="{{ url_for('objectifs.liste') }}" class="btn btn-outline">Annuler</a>
+        {{ form.submit(class="btn btn-primary") }}
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

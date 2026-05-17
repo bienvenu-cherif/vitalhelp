@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Mes mesures — VitalHelp{% endblock %}
+
+{% block content %}
+<div class="container">
+  <header class="page-header page-header-flex">
+    <div>
+      <span class="page-eyebrow">Historique</span>
+      <h1>Mes mesures</h1>
+      <p class="text-muted">{{ mesures|length }} entrée{{ 's' if mesures|length > 1 else '' }}</p>
+    </div>
+    <a href="{{ url_for('mesures.ajouter') }}" class="btn btn-primary">+ Ajouter une mesure</a>
+  </header>
+
+  {% if mesures %}
+    <div class="mesure-list">
+      {% for m in mesures %}
+      <article class="mesure-card">
+        <div class="mesure-header">
+          <time>{{ m.date_mesure.strftime('%d %b %Y · %H:%M') }}</time>
+          <form method="POST" action="{{ url_for('mesures.supprimer', mesure_id=m.id) }}" onsubmit="return confirm('Supprimer cette mesure ?');" style="display:inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <button type="submit" class="icon-btn" title="Supprimer">🗑️</button>
+          </form>
+        </div>
+        <div class="mesure-badges">
+          {% if m.poids_kg %}<span class="badge-data"><small>POIDS</small><strong>{{ m.poids_kg }}</strong>kg</span>{% endif %}
+          {% if m.imc %}<span class="badge-data"><small>IMC</small><strong>{{ m.imc }}</strong></span>{% endif %}
+          {% if m.tension_sys %}<span class="badge-data"><small>TENSION</small><strong>{{ m.tension_sys }}/{{ m.tension_dia }}</strong>mmHg</span>{% endif %}
+          {% if m.glycemie_gl %}<span class="badge-data"><small>GLYCÉMIE</small><strong>{{ m.glycemie_gl }}</strong>g/L</span>{% endif %}
+          {% if m.freq_cardiaque %}<span class="badge-data"><small>F.C.</small><strong>{{ m.freq_cardiaque }}</strong>bpm</span>{% endif %}
+        </div>
+        {% if m.note %}<p class="mesure-note">"{{ m.note }}"</p>{% endif %}
+        {% if m.alertes %}
+          <div class="alertes-inline">
+            {% for a in m.alertes %}
+              <div class="alerte alerte-{{ a.niveau }}">⚠ {{ a.message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="placeholder-card">
+      <h3>Aucune mesure</h3>
+      <p>Commencez par enregistrer votre première mesure.</p>
+      <a href="{{ url_for('mesures.ajouter') }}" class="btn btn-primary">Ajouter une mesure</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

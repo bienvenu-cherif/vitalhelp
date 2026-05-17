@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Mes objectifs — VitalHelp{% endblock %}
+
+{% block content %}
+<div class="container">
+  <header class="page-header page-header-flex">
+    <div>
+      <span class="page-eyebrow">Suivi</span>
+      <h1>Mes objectifs</h1>
+      <p class="text-muted">Fixez des cibles, suivez votre progression.</p>
+    </div>
+    <a href="{{ url_for('objectifs.ajouter') }}" class="btn btn-primary">+ Nouvel objectif</a>
+  </header>
+
+  {% if objectifs %}
+  <div class="goals-grid">
+    {% for obj in objectifs %}
+    <article class="goal-card">
+      <div class="goal-header">
+        <div class="goal-icon">{% if obj.progression == 100 %}✅{% else %}🎯{% endif %}</div>
+        <div class="goal-title">
+          <h3>{{ obj.titre }}</h3>
+          <small>{{ obj.type_indicateur }}</small>
+        </div>
+        <form method="POST" action="{{ url_for('objectifs.supprimer', obj_id=obj.id) }}" onsubmit="return confirm('Supprimer ?');" style="display:inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button type="submit" class="icon-btn" title="Supprimer">🗑️</button>
+        </form>
+      </div>
+
+      <div class="goal-values">
+        <div><small>Départ</small><strong>{{ obj.valeur_depart }}{{ obj.unite }}</strong></div>
+        <div><small>Actuel</small><strong>{{ obj.valeur_actuelle or '—' }}{{ obj.unite if obj.valeur_actuelle else '' }}</strong></div>
+        <div><small>Cible</small><strong class="accent">{{ obj.valeur_cible }}{{ obj.unite }}</strong></div>
+      </div>
+
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: {{ obj.progression }}%"></div>
+      </div>
+      <div class="progress-meta">
+        <span>{{ obj.progression }}% atteint</span>
+        {% if obj.deadline %}<span>📅 {{ obj.deadline.strftime('%d %b %Y') }}</span>{% endif %}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="placeholder-card">
+    <h3>🎯 Aucun objectif</h3>
+    <p>Définissez votre premier objectif santé.</p>
+    <a href="{{ url_for('objectifs.ajouter') }}" class="btn btn-primary">Créer un objectif</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

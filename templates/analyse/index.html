@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Analyse IA — VitalHelp{% endblock %}
+
+{% block content %}
+<div class="container">
+  <header class="page-header page-header-flex">
+    <div>
+      <span class="page-eyebrow">Intelligence Artificielle</span>
+      <h1>Analyse IA</h1>
+      <p class="text-muted">Llama 3.3 analyse vos mesures et vous explique.</p>
+    </div>
+    <form method="POST" action="{{ url_for('analyse.lancer') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+      <button type="submit" class="btn btn-primary" id="run-ai-btn">
+        <span>✨</span> Nouvelle analyse
+      </button>
+    </form>
+  </header>
+
+  {% if not derniere %}
+    <div class="placeholder-card">
+      <div class="placeholder-icon">🧠</div>
+      <h3>Lancez votre première analyse</h3>
+      <p>Llama 3.3 70B examinera vos tendances et vous fournira interprétation, risques et recommandations.</p>
+      <form method="POST" action="{{ url_for('analyse.lancer') }}" style="margin-top:1rem">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <button type="submit" class="btn btn-primary">✨ Analyser maintenant</button>
+      </form>
+    </div>
+  {% else %}
+
+  {# === Grille principale === #}
+  <div class="ai-grid">
+    <!-- Score global -->
+    <div class="ai-score-card">
+      <small>SCORE GLOBAL</small>
+      <div class="ai-score-value {{ 'good' if derniere.score_global >= 75 else ('avg' if derniere.score_global >= 50 else 'bad') }}">
+        {{ derniere.score_global }}
+      </div>
+      <div class="ai-score-suffix">sur 100</div>
+      <p class="ai-resume">{{ derniere.resume }}</p>
+      <div class="ai-meta">
+        <small>⏱ {{ derniere.created_at.strftime('%d %b %Y à %H:%M') }}</small>
+        <small>📊 {{ derniere.nb_mesures_analysees }} mesure(s) analysée(s)</small>
+      </div>
+    </div>
+
+    <!-- Interprétation -->
+    <div class="ai-card">
+      <div class="ai-card-head">
+        <div class="ai-icon">📋</div>
+        <h3>Interprétation</h3>
+      </div>
+      <p class="ai-text">{{ derniere.interpretation }}</p>
+    </div>
+
+    <!-- Risques -->
+    <div class="ai-card ai-card-risk">
+      <div class="ai-card-head">
+        <div class="ai-icon ai-icon-danger">⚠️</div>
+        <h3>Risques détectés</h3>
+      </div>
+      {% if derniere.risques %}
+        <ul class="ai-list">
+          {% for r in derniere.risques %}
+            <li>{{ r }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-muted">Aucun risque majeur identifié. 🌿</p>
+      {% endif %}
+    </div>
+
+    <!-- Recommandations -->
+    <div class="ai-card ai-card-reco">
+      <div class="ai-card-head">
+        <div class="ai-icon ai-icon-success">💡</div>
+        <h3>Recommandations</h3>
+      </div>
+      {% if derniere.recommandations %}
+        <ol class="ai-reco-list">
+          {% for r in derniere.recommandations %}
+            <li><span class="num">{{ loop.index }}</span><span>{{ r }}</span></li>
+          {% endfor %}
+        </ol>
+      {% else %}
+        <p class="text-muted">Continuez votre suivi régulier.</p>
+      {% endif %}
+      <p class="ai-disclaimer">
+        ⚠️ VitalHelp est un outil de prévention. Consultez toujours votre médecin pour un avis professionnel.
+      </p>
+    </div>
+  </div>
+
+  {# === Historique === #}
+  {% if historique %}
+  <section class="section">
+    <h2>Analyses précédentes</h2>
+    <div class="history-list">
+      {% for a in historique %}
+      <a href="{{ url_for('analyse.detail', analyse_id=a.id) }}" class="history-row">
+        <div class="history-score history-score-{{ 'good' if a.score_global >= 75 else ('avg' if a.score_global >= 50 else 'bad') }}">{{ a.score_global }}</div>
+        <div class="history-content">
+          <strong>{{ a.resume }}</strong>
+          <small>{{ a.created_at.strftime('%d %b %Y à %H:%M') }}</small>
+        </div>
+        <span class="history-arrow">→</span>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% endif %}
+</div>
+
+<script>
+  // Indicateur de chargement quand on clique sur le bouton
+  document.querySelectorAll('form[action*="lancer"]').forEach(form => {
+    form.addEventListener('submit', () => {
+      const btn = form.querySelector('button[type="submit"]');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> Analyse en cours...';
+      }
+    });
+  });
+</script>
+{% endblock %}

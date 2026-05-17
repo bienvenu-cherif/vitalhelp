@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Partage médecin — VitalHelp{% endblock %}
+
+{% block content %}
+<div class="container container-narrow">
+  <header class="page-header">
+    <span class="page-eyebrow">Partage médecin</span>
+    <h1>Liens sécurisés</h1>
+    <p class="text-muted">Générez un lien en lecture seule pour votre médecin. Il pourra consulter vos courbes et mesures sans créer de compte.</p>
+  </header>
+
+  {# === Création d'un nouveau lien === #}
+  <div class="card">
+    <div class="card-head-row">
+      <div class="ai-icon">🔗</div>
+      <div>
+        <h3>Nouveau lien de partage</h3>
+        <small class="text-muted">Le lien expirera automatiquement après la durée choisie.</small>
+      </div>
+    </div>
+    <form method="POST" class="inline-form">
+      {{ form.hidden_tag() }}
+      <div class="form-group">
+        {{ form.duree_jours.label }}
+        {{ form.duree_jours(class="input", style="max-width:140px") }}
+      </div>
+      {{ form.submit(class="btn btn-primary") }}
+    </form>
+  </div>
+
+  {# === Liste des liens === #}
+  <h2 style="margin-top:2.5rem">Liens actifs</h2>
+
+  {% if liens %}
+    <div class="liens-list">
+      {% for l in liens %}
+      <div class="lien-card {% if l.revoked %}is-revoked{% elif l.est_expire %}is-expired{% endif %}">
+        <div class="lien-head">
+          <div>
+            <span class="lien-status">
+              {% if l.revoked %}<span class="badge badge-danger">Révoqué</span>
+              {% elif l.est_expire %}<span class="badge badge-muted">Expiré</span>
+              {% else %}<span class="badge badge-success">✓ Actif</span>
+              {% endif %}
+            </span>
+            <span class="lien-id">Lien #{{ l.token[:8] }}…</span>
+          </div>
+          <div class="lien-actions">
+            {% if l.est_valide %}
+              <button type="button" class="btn btn-outline btn-sm copy-btn" data-link="{{ url_for('public.dossier', token=l.token, _external=True) }}">📋 Copier</button>
+              <form method="POST" action="{{ url_for('partage.revoquer', lien_id=l.id) }}" style="display:inline" onsubmit="return confirm('Révoquer ce lien ?');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <button type="submit" class="btn btn-ghost btn-sm" title="Révoquer">🚫</button>
+              </form>
+            {% endif %}
+            <form method="POST" action="{{ url_for('partage.supprimer', lien_id=l.id) }}" style="display:inline" onsubmit="return confirm('Supprimer définitivement ?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+              <button type="submit" class="icon-btn" title="Supprimer">🗑️</button>
+            </form>
+          </div>
+        </div>
+
+        <code class="lien-url">{{ url_for('public.dossier', token=l.token, _external=True) }}</code>
+
+        <div class="lien-meta">
+          <span>📅 Créé le {{ l.created_at.strftime('%d %b %Y') }}</span>
+          {% if l.expires_at %}<span>⏰ Expire le {{ l.expires_at.strftime('%d %b %Y à %H:%M') }}</span>{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="placeholder-card">
+      <p class="text-muted">Aucun lien créé pour l'instant.</p>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.link);
+        const original = btn.innerHTML;
+        btn.innerHTML = '✓ Copié !';
+        btn.classList.add('btn-primary');
+        btn.classList.remove('btn-outline');
+        setTimeout(() => {
+          btn.innerHTML = original;
+          btn.classList.remove('btn-primary');
+          btn.classList.add('btn-outline');
+        }, 2000);
+      } catch (e) { alert('Erreur de copie'); }
+    });
+  });
+</script>
+{% endblock %}

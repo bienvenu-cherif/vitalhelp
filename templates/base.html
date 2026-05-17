@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}VitalHelp{% endblock %}</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <header class="navbar">
+    <a href="{{ url_for('main.accueil') }}" class="logo">
+      <span class="logo-icon">🩺</span>
+      <span class="logo-text">VitalHelp</span>
+    </a>
+    <nav class="nav-actions">
+      {% if current_user.is_authenticated %}
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-ghost">Tableau de bord</a>
+        <a href="{{ url_for('mesures.liste') }}" class="btn btn-ghost">Mesures</a>
+        <a href="{{ url_for('objectifs.liste') }}" class="btn btn-ghost">Objectifs</a>
+        <a href="{{ url_for('analyse.index') }}" class="btn btn-ghost">🧠 Analyse IA</a>
+        <a href="{{ url_for('partage.liste') }}" class="btn btn-ghost">🔗 Partage</a>
+        <a href="{{ url_for('auth.profil') }}" class="user-chip" title="Mon profil">
+          <span class="avatar-small">{{ current_user.nom[0]|upper }}</span>
+          {{ current_user.nom.split()[0] }}
+        </a>
+        <a href="{{ url_for('auth.deconnexion') }}" class="btn btn-outline">Déconnexion</a>
+      {% else %}
+        <a href="{{ url_for('auth.connexion') }}" class="btn btn-ghost">Connexion</a>
+        <a href="{{ url_for('auth.inscription') }}" class="btn btn-primary">Commencer</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  {# Messages flash (succès, erreur, info, warning) #}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for category, msg in messages %}
+          <div class="flash flash-{{ category }}">
+            <span>{{ msg }}</span>
+            <button onclick="this.parentElement.remove()" aria-label="Fermer">×</button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <p>VitalHelp © 2026 — Outil de prévention, pas de diagnostic. Consultez votre médecin.</p>
+  </footer>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Notre JS custom -->
+  <script src="{{ url_for('static', filename='js/reveal.js') }}"></script>
+  {% block scripts %}{% endblock %}
+
+</body>
+<div class="top-loader" id="topLoader"></div>
+</html>

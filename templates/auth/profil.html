@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Mon profil — VitalHelp{% endblock %}
+
+{% block content %}
+<div class="container container-narrow">
+  <header class="page-header reveal" style="--delay:0s">
+    <span class="page-eyebrow">Compte</span>
+    <h1>Mon profil</h1>
+    <p class="text-muted">Modifiez vos informations personnelles.</p>
+  </header>
+
+  <div class="profil-grid">
+    {# Carte stats à gauche #}
+    <aside class="profil-stats reveal" style="--delay:0.1s">
+      <div class="avatar-big">
+        {{ current_user.nom[0]|upper }}
+      </div>
+      <h2>{{ current_user.nom }}</h2>
+      <small class="text-muted">{{ current_user.email }}</small>
+
+      <div class="profil-stats-list">
+        <div><small>Membre depuis</small><strong>{{ current_user.created_at.strftime('%b %Y') }}</strong></div>
+        <div><small>Mesures</small><strong>{{ current_user.mesures|length }}</strong></div>
+        <div><small>Objectifs</small><strong>{{ current_user.objectifs|length }}</strong></div>
+        <div><small>Analyses IA</small><strong>{{ current_user.analyses_ia|length }}</strong></div>
+      </div>
+    </aside>
+
+    {# Formulaire à droite #}
+    <div class="card reveal" style="--delay:0.2s">
+      <h3 style="font-family:var(--font-display);margin-bottom:1.5rem">Informations</h3>
+      <form method="POST" novalidate>
+        {{ form.hidden_tag() }}
+        <div class="form-row">
+          <div class="form-group full">
+            {{ form.nom.label }}
+            {{ form.nom(class="input") }}
+            {% for e in form.nom.errors %}<span class="error">{{ e }}</span>{% endfor %}
+          </div>
+          <div class="form-group">
+            {{ form.age.label }}
+            {{ form.age(class="input") }}
+            {% for e in form.age.errors %}<span class="error">{{ e }}</span>{% endfor %}
+          </div>
+          <div class="form-group">
+            {{ form.taille_cm.label }}
+            {{ form.taille_cm(class="input") }}
+            {% for e in form.taille_cm.errors %}<span class="error">{{ e }}</span>{% endfor %}
+          </div>
+          <div class="form-group full">
+            {{ form.sexe.label }}
+            {{ form.sexe(class="input") }}
+          </div>
+        </div>
+        <div class="form-actions">
+          {{ form.submit(class="btn btn-primary") }}
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+# Environnement Python
+venv/
+__pycache__/
+*.pyc
+
+# Variables sensibles
+.env
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+instance/
+*.sqlite

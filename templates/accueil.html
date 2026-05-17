@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}VitalHelp — Votre santé, racontée au jour le jour{% endblock %}
+
+{% block content %}
+<section class="hero-cinematic">
+  {# === Fond rotatif === #}
+  <div class="hero-bg">
+    <div class="hero-bg-slide bg-1" style="background-image: url('{{ url_for('static', filename='img/hero/hopital.jpg') }}')"></div>
+    <div class="hero-bg-slide bg-2" style="background-image: url('{{ url_for('static', filename='img/hero/tension.jpg') }}')"></div>
+    <div class="hero-bg-slide bg-3" style="background-image: url('{{ url_for('static', filename='img/hero/stethoscope.jpg') }}')"></div>
+    <div class="hero-bg-overlay"></div>
+  </div>
+
+  {# === Cartes flottantes en arrière-plan === #}
+  <div class="floating-elements" aria-hidden="true">
+    <div class="float-card float-1">
+      <span class="float-emoji">💗</span>
+      <div><small>FC</small><strong>68 bpm</strong></div>
+    </div>
+    <div class="float-card float-2">
+      <span class="float-emoji">⚖️</span>
+      <div><small>POIDS</small><strong>72.4 kg</strong></div>
+    </div>
+    <div class="float-card float-3">
+      <span class="float-emoji">🩸</span>
+      <div><small>GLYCÉMIE</small><strong>0.92 g/L</strong></div>
+    </div>
+    <div class="float-card float-4">
+      <span class="float-emoji">🩺</span>
+      <div><small>TENSION</small><strong>118/76</strong></div>
+    </div>
+  </div>
+
+  {# === Contenu central === #}
+  <div class="hero-content reveal">
+    <span class="badge-hero reveal" style="--delay:0.1s">✨ Analyse IA · Suivi médical · Partage médecin</span>
+
+    <h1 class="reveal" style="--delay:0.2s">
+      Votre santé,<br>
+      <span class="accent">racontée</span> au jour le jour.
+    </h1>
+
+    <p class="lead reveal" style="--delay:0.35s">
+      VitalHelp transforme vos mesures — poids, tension, glycémie, fréquence cardiaque —
+      en un récit clair, interprété par l'IA, partageable avec votre médecin en un clic.
+    </p>
+
+    <div class="cta-group reveal" style="--delay:0.5s">
+      <a href="{{ url_for('auth.inscription') }}" class="btn btn-primary btn-lg">
+        Créer mon journal <span class="arrow">→</span>
+      </a>
+      <a href="{{ url_for('auth.connexion') }}" class="btn btn-outline btn-lg">J'ai déjà un compte</a>
+    </div>
+
+    <div class="live-stats reveal" style="--delay:0.6s">
+      <div><strong>{{ stats.users }}</strong><small>journaux ouverts</small></div>
+      <span class="live-dot"></span>
+      <div><strong>{{ stats.mesures }}</strong><small>mesures enregistrées</small></div>
+    </div>
+
+    <div class="trust-row reveal" style="--delay:0.7s">
+      <span>🔒 Données chiffrées</span>
+      <span>·</span>
+      <span>⚕️ Normes médicales OMS</span>
+      <span>·</span>
+      <span>🧠 Coach IA inclus</span>
+    </div>
+  </div>
+</section>
+
+{# === Section "Pourquoi" === #}
+<section class="features">
+  <div class="container">
+    <div class="features-head reveal-on-scroll">
+      <span class="page-eyebrow">Pourquoi VitalHelp</span>
+      <h2>Plus qu'un journal. Un compagnon de prévention.</h2>
+      <p class="text-muted">Nous transformons chaque mesure en sens. Vous voyez les tendances, l'IA explique, votre médecin agit.</p>
+    </div>
+
+    <div class="features-grid">
+      <article class="feature-card reveal-on-scroll" style="--delay:0">
+        <div class="feature-icon">📈</div>
+        <h3>Courbes intelligentes</h3>
+        <p>Visualisez l'évolution de vos indicateurs avec moyennes mobiles et zones d'alerte automatiques.</p>
+      </article>
+
+      <article class="feature-card reveal-on-scroll feature-accent" style="--delay:0.1s">
+        <div class="feature-icon">🧠</div>
+        <h3>Coach IA Llama 3.3</h3>
+        <p>Une intelligence médicale interprète vos tendances et vous donne risques + recommandations.</p>
+      </article>
+
+      <article class="feature-card reveal-on-scroll" style="--delay:0.2s">
+        <div class="feature-icon">🎯</div>
+        <h3>Objectifs personnels</h3>
+        <p>Fixez votre poids cible, votre tension idéale. Suivez votre progression au quotidien.</p>
+      </article>
+
+      <article class="feature-card reveal-on-scroll" style="--delay:0.3s">
+        <div class="feature-icon">🔗</div>
+        <h3>Partage médecin</h3>
+        <p>Générez un lien sécurisé et expirable. Votre médecin consulte vos courbes en lecture seule.</p>
+      </article>
+
+      <article class="feature-card reveal-on-scroll" style="--delay:0.4s">
+        <div class="feature-icon">⚖️</div>
+        <h3>IMC & catégories d'âge</h3>
+        <p>Calcul automatique de l'IMC et interprétation adaptée à votre âge.</p>
+      </article>
+
+      <article class="feature-card reveal-on-scroll" style="--delay:0.5s">
+        <div class="feature-icon">🚨</div>
+        <h3>Alertes hors normes</h3>
+        <p>Notification instantanée si une mesure dépasse les seuils médicaux OMS.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+{# === Bande citation === #}
+<section class="quote-band">
+  <div class="container">
+    <blockquote class="reveal-on-scroll">
+      <span class="quote-mark">"</span>
+      Quelques secondes par jour. Une vision sur des années.
+      <small>Prévenir, c'est agir.</small>
+    </blockquote>
+    <a href="{{ url_for('auth.inscription') }}" class="btn btn-primary btn-lg">Démarrer gratuitement →</a>
+  </div>
+</section>
+{% endblock %}

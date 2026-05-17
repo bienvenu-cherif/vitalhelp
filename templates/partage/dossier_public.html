@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dossier {{ patient.nom }} — VitalHelp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="public-page">
+
+  {# === Fond glassmorphism === #}
+  <div class="public-bg"></div>
+
+  {# === Header simple === #}
+  <header class="public-header no-print">
+    <div class="logo">
+      <span class="logo-icon">🩺</span>
+      <span class="logo-text">VitalHelp</span>
+      <span class="badge badge-muted">Partage médecin · lecture seule</span>
+    </div>
+    <button onclick="window.print()" class="btn btn-outline">🖨 Imprimer</button>
+  </header>
+
+  <main class="public-main">
+
+    {# === Carte d'identité patient === #}
+    <section class="patient-card">
+      <span class="page-eyebrow">Dossier patient — Lecture seule</span>
+      <h1>{{ patient.nom }}</h1>
+      <div class="patient-info">
+        <span><small>Âge</small><strong>{{ patient.age }} ans</strong></span>
+        <span><small>Sexe</small><strong>{{ patient.sexe|capitalize }}</strong></span>
+        <span><small>Taille</small><strong>{{ patient.taille_cm }} cm</strong></span>
+        <span><small>Mesures</small><strong>{{ mesures|length }}</strong></span>
+        <span><small>Alertes récentes</small><strong class="{{ 'accent' if alertes_recentes else '' }}">{{ alertes_recentes|length }}</strong></span>
+      </div>
+    </section>
+
+    {# === Dernière mesure === #}
+    {% if derniere %}
+    <section class="bento-grid public-bento">
+      {% if derniere.poids_kg %}<div class="bento glass-card"><small>POIDS</small><strong>{{ derniere.poids_kg }}<em>kg</em></strong></div>{% endif %}
+      {% if derniere.imc %}<div class="bento glass-card"><small>IMC</small><strong>{{ derniere.imc }}</strong></div>{% endif %}
+      {% if derniere.tension_sys %}<div class="bento glass-card"><small>TENSION</small><strong>{{ derniere.tension_sys }}/{{ derniere.tension_dia }}<em>mmHg</em></strong></div>{% endif %}
+      {% if derniere.glycemie_gl %}<div class="bento glass-card"><small>GLYCÉMIE</small><strong>{{ derniere.glycemie_gl }}<em>g/L</em></strong></div>{% endif %}
+      {% if derniere.freq_cardiaque %}<div class="bento glass-card"><small>FRÉQ. CARD.</small><strong>{{ derniere.freq_cardiaque }}<em>bpm</em></strong></div>{% endif %}
+    </section>
+    {% endif %}
+
+    {# === Courbes === #}
+    {% if mesures %}
+    <section class="charts-grid">
+      <div class="chart-card glass-card">
+        <header class="chart-header"><h3>Poids</h3></header>
+        <div class="chart-wrapper"><canvas id="pub-poids"></canvas></div>
+      </div>
+      <div class="chart-card glass-card">
+        <header class="chart-header"><h3>Tension artérielle</h3></header>
+        <div class="chart-wrapper"><canvas id="pub-tension"></canvas></div>
+      </div>
+      <div class="chart-card glass-card">
+        <header class="chart-header"><h3>Glycémie</h3></header>
+        <div class="chart-wrapper"><canvas id="pub-glycemie"></canvas></div>
+      </div>
+      <div class="chart-card glass-card">
+        <header class="chart-header"><h3>Fréquence cardiaque</h3></header>
+        <div class="chart-wrapper"><canvas id="pub-fc"></canvas></div>
+      </div>
+    </section>
+    {% endif %}
+
+    {# === Alertes === #}
+    {% if alertes_recentes %}
+    <section class="card glass-card section">
+      <h2>🚨 Valeurs hors normes récentes</h2>
+      <div class="alertes-list">
+        {% for a in alertes_recentes[:10] %}
+          <div class="alerte alerte-{{ a.niveau }}">
+            <span>{{ a.message }}</span>
+            <time>{{ a.date.strftime('%d %b %Y') }}</time>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    {# === Pied === #}
+    <footer class="public-footer">
+      Document généré le {{ lien.created_at.strftime('%d/%m/%Y à %H:%M') }}.
+      {% if lien.expires_at %}Lien valide jusqu'au {{ lien.expires_at.strftime('%d/%m/%Y') }}.{% endif %}
+      <br>
+      VitalHelp — Outil de prévention, pas de diagnostic.
+    </footer>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+    const TOKEN = "{{ lien.token }}";
+    const COLORS = { primary: '#E07A5F', secondary: '#81B29A', accent: '#2B3A34', danger: '#D76A6A', muted: '#5C6A64' };
+    Chart.defaults.font.family = "'Work Sans', system-ui, sans-serif";
+    Chart.defaults.color = COLORS.muted;
+    Chart.defaults.plugins.legend.display = false;
+
+    function dataset(label, data, color, dashed = false) {
+      return {
+        label, data,
+        borderColor: color,
+        borderWidth: dashed ? 2 : 2.5,
+        borderDash: dashed ? [6, 4] : [],
+        tension: 0.4,
+        fill: !dashed,
+        backgroundColor: dashed ? 'transparent' : color + '22',
+        pointRadius: dashed ? 0 : 3,
+        spanGaps: true,
+      };
+    }
+
+    function opts(unite) {
+      return {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          tooltip: {
+            backgroundColor: COLORS.accent, padding: 10, borderRadius: 10,
+            callbacks: { label: c => `${c.dataset.label}: ${c.parsed.y} ${unite}` }
+          }
+        },
+        scales: {
+          x: { grid: { display: false } },
+          y: { grid: { color: '#E5E1D8' } },
+        },
+      };
+    }
+
+    fetch(`/share/${TOKEN}/donnees`).then(r => r.json()).then(d => {
+      const labels = d.labels;
+      new Chart(document.getElementById('pub-poids'), {
+        type: 'line',
+        data: { labels, datasets: [
+          dataset('Poids', d.poids.valeurs, COLORS.primary),
+          dataset('Moyenne mobile', d.poids.moyenne_mobile, COLORS.accent, true),
+        ]},
+        options: opts('kg')
+      });
+      new Chart(document.getElementById('pub-tension'), {
+        type: 'line',
+        data: { labels, datasets: [
+          dataset('Systolique', d.tension_sys.valeurs, COLORS.primary),
+          dataset('Diastolique', d.tension_dia.valeurs, COLORS.secondary),
+        ]},
+        options: opts('mmHg')
+      });
+      new Chart(document.getElementById('pub-glycemie'), {
+        type: 'line',
+        data: { labels, datasets: [
+          dataset('Glycémie', d.glycemie.valeurs, COLORS.secondary),
+          dataset('Moyenne mobile', d.glycemie.moyenne_mobile, COLORS.accent, true),
+        ]},
+        options: opts('g/L')
+      });
+      new Chart(document.getElementById('pub-fc'), {
+        type: 'line',
+        data: { labels, datasets: [
+          dataset('FC', d.freq_cardiaque.valeurs, COLORS.primary),
+          dataset('Moyenne mobile', d.freq_cardiaque.moyenne_mobile, COLORS.accent, true),
+        ]},
+        options: opts('bpm')
+      });
+    });
+  </script>
+</body>
+</html>
