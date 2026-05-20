@@ -163,7 +163,7 @@ h1, h2, h3 {
   background:
     linear-gradient(180deg, rgba(249, 248, 246, 0.35) 0%, rgba(249, 248, 246, 0.85) 60%, var(--bg) 100%),
     linear-gradient(135deg, rgba(43, 58, 52, 0.25), rgba(129, 178, 154, 0.15));
-  opacity: 0.2;
+  opacity: 0.1;
 }
 
 /* --- Cartes flottantes --- */
