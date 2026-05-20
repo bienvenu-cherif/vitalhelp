@@ -1,13 +1,13 @@
 {% extends "base.html" %}
-{% block title %}Analyse IA — VitalHelp{% endblock %}
+{% block title %}Analyse — VitalHelp{% endblock %}
 
 {% block content %}
 <div class="container">
   <header class="page-header page-header-flex">
     <div>
-      <span class="page-eyebrow">Intelligence Artificielle</span>
-      <h1>Analyse IA</h1>
-      <p class="text-muted">Llama 3.3 analyse vos mesures et vous explique.</p>
+      <span class="page-eyebrow">Conseiller en ligne</span>
+      <h1>Analyse </h1>
+      <p class="text-muted">un conseiller en ligne analyse vos mesures et vous explique.</p>
     </div>
     <form method="POST" action="{{ url_for('analyse.lancer') }}">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -21,7 +21,7 @@
     <div class="placeholder-card">
       <div class="placeholder-icon">🧠</div>
       <h3>Lancez votre première analyse</h3>
-      <p>Llama 3.3 70B examinera vos tendances et vous fournira interprétation, risques et recommandations.</p>
+      <p>un conseiller examinera vos tendances et vous fournira interprétation, risques et recommandations.</p>
       <form method="POST" action="{{ url_for('analyse.lancer') }}" style="margin-top:1rem">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <button type="submit" class="btn btn-primary">✨ Analyser maintenant</button>
