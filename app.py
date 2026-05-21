@@ -18,7 +18,10 @@ def create_app():
     db.init_app(app)
     login_manager.init_app(app)
     bcrypt.init_app(app)
-    os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+    
+    # Créer le dossier uploads si la config existe
+    if "UPLOAD_FOLDER" in app.config:
+        os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
