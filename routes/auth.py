@@ -23,15 +23,7 @@ def inscription():
         avatar_url = None
         avatar_file = form.avatar.data
         if avatar_file and getattr(avatar_file, 'filename', None):
-            filename = secure_filename(avatar_file.filename)
-            if filename:
-                ext = filename.rsplit('.', 1)[-1].lower()
-                unique_name = f"{md5((form.email.data.lower().strip() + filename).encode('utf-8')).hexdigest()}.{ext}"
-                upload_folder = current_app.config["UPLOAD_FOLDER"]
-                os.makedirs(upload_folder, exist_ok=True)
-                avatar_path = os.path.join(upload_folder, unique_name)
-                avatar_file.save(avatar_path)
-                avatar_url = url_for("static", filename=f"uploads/avatars/{unique_name}")
+            avatar_url = save_avatar_file(avatar_file, form.email.data.lower().strip())
 
         # 1. Créer l'utilisateur
         user = User(
@@ -107,7 +99,7 @@ def save_avatar_file(file_storage, identifier):
 
     ext = filename.rsplit('.', 1)[-1].lower()
     unique_name = f"{md5((identifier + filename).encode('utf-8')).hexdigest()}.{ext}"
-    upload_folder = current_app.config["UPLOAD_FOLDER"]
+    upload_folder = current_app.config.get("UPLOAD_FOLDER") or os.path.join(current_app.root_path, "static", "uploads", "avatars")
     os.makedirs(upload_folder, exist_ok=True)
     avatar_path = os.path.join(upload_folder, unique_name)
     file_storage.save(avatar_path)

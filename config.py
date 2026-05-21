@@ -1,6 +1,5 @@
 # config.py
 import os
-import os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -35,6 +34,9 @@ class Config:
         )
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    MAX_CONTENT_LENGTH = 2 * 1024 * 1024
+    UPLOAD_FOLDER = os.path.join(basedir, "static", "uploads", "avatars")
+    ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
 
     # --- IA Groq ---
     GROQ_API_KEY = os.getenv("GROQ_API_KEY")
