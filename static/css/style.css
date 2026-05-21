@@ -299,6 +299,7 @@ footer {
   min-height: calc(100vh - 5rem);
   display: grid;
   grid-template-columns: 1fr 1fr;
+  align-items: stretch;
 }
 
 .auth-aside {
@@ -308,8 +309,9 @@ footer {
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: space-between;
   overflow: hidden;
+  min-height: calc(100vh - 5rem);
 }
 
 .auth-aside::before,
@@ -356,12 +358,12 @@ footer {
 
 .auth-aside-hero {
   width: 100%;
-  min-height: calc(100vh - 6rem);
+  min-height: calc(100vh - 8rem);
   border-radius: 1rem;
   overflow: hidden;
   position: relative;
   margin: 1rem 0 1.5rem 0;
-  background: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.08));
+  background: linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.04));
   display: flex;
   align-items: flex-end;
   justify-content: flex-start;
@@ -381,8 +383,9 @@ footer {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,0.12) 36%, rgba(0,0,0,0.48) 100%);
+  background: linear-gradient(180deg, rgba(0,0,0,0.08) 20%, rgba(0,0,0,0.28) 100%);
   pointer-events: none;
+  z-index: 2;
 }
 
 .hero-avatar-fallback {
@@ -395,13 +398,13 @@ footer {
   height: 3.5rem;
   font-size: 1.6rem;
   border-radius: 0.8rem;
-  background: rgba(255,255,255,0.12);
-  z-index: 2;
+  background: rgba(255,255,255,0.15);
+  z-index: 4;
 }
 
 .hero-caption {
   position: relative;
-  z-index: 3;
+  z-index: 5;
   padding: 1.5rem;
   color: white;
 }
@@ -422,6 +425,7 @@ footer {
   align-items: center;
   justify-content: center;
   padding: 3rem 2rem;
+  min-height: calc(100vh - 5rem);
 }
 
 .auth-form-inner {
@@ -430,6 +434,7 @@ footer {
   border-radius: 1.25rem;
   padding: 2.5rem;
   box-shadow: 0 30px 80px rgba(28, 34, 32, 0.08);
+  min-height: 400px;
 }
 
 .auth-form-inner h1 {
