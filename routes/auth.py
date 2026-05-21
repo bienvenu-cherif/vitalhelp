@@ -54,14 +54,18 @@ def connexion():
 
     form = ConnexionForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data.lower().strip()).first()
-        if user and user.check_password(form.password.data):
-            login_user(user, remember=True)  # remember=True : cookie persistant
-            flash(f"Bon retour {user.nom} !", "success")
-            # Si on essayait d'accéder à une page protégée, on y retourne
-            next_page = request.args.get("next")
-            return redirect(next_page or url_for("main.dashboard"))
-        flash("Identifiants invalides.", "error")
+        try:
+            user = User.query.filter_by(email=form.email.data.lower().strip()).first()
+            if user and user.check_password(form.password.data):
+                login_user(user, remember=True)  # remember=True : cookie persistant
+                flash(f"Bon retour {user.nom} !", "success")
+                # Si on essayait d'accéder à une page protégée, on y retourne
+                next_page = request.args.get("next")
+                return redirect(next_page or url_for("main.dashboard"))
+            flash("Identifiants invalides.", "error")
+        except Exception:
+            current_app.logger.exception("Erreur pendant la tentative de connexion")
+            flash("Erreur serveur : impossible de vérifier vos identifiants. Réessayez plus tard.", "error")
 
     return render_template("auth/connexion.html", form=form)
 

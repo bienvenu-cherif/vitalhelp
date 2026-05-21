@@ -34,6 +34,7 @@ class Config:
         )
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {"pool_pre_ping": True}
     MAX_CONTENT_LENGTH = 2 * 1024 * 1024
     UPLOAD_FOLDER = os.path.join(basedir, "static", "uploads", "avatars")
     ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
