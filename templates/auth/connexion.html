@@ -5,18 +5,15 @@
 <div class="auth-shell">
   <aside class="auth-aside">
     <a href="{{ url_for('main.accueil') }}" class="back-link">← Retour à l'accueil</a>
-    <div class="auth-aside-preview" id="loginAvatarPreview">
-      <div class="avatar-preview avatar-fallback" id="loginAvatarFallback">🩺</div>
-      <div class="avatar-info">
+
+    <div class="auth-aside-hero" id="loginAvatarHero">
+      <div class="hero-avatar-fallback" id="loginAvatarFallback">🩺</div>
+      <div class="hero-caption">
         <strong id="loginAvatarName">Bon retour parmi nous.</strong>
         <small id="loginAvatarHint">Commencez à saisir votre email pour retrouver votre profil.</small>
       </div>
     </div>
-    <div>
-      <div class="logo-big">🩺</div>
-      <h2>Bon retour parmi nous.</h2>
-      <p>Continuez votre suivi santé.</p>
-    </div>
+
     <small>Données chiffrées · Conforme aux normes médicales</small>
   </aside>
 
@@ -62,6 +59,11 @@
       avatarImage.remove();
       avatarImage = null;
     }
+    // reset hero background
+    const hero = document.getElementById('loginAvatarHero');
+    if (hero) {
+      hero.style.backgroundImage = '';
+    }
     avatarFallback.textContent = '🩺';
     avatarFallback.style.display = 'grid';
     avatarName.textContent = 'Bon retour parmi nous.';
@@ -69,13 +71,13 @@
   }
 
   function showUserPreview(data) {
-    if (!avatarImage) {
-      avatarImage = document.createElement('img');
-      avatarImage.className = 'avatar-preview';
-      avatarPreview.insertBefore(avatarImage, avatarFallback);
+    // set large hero background image
+    const hero = document.getElementById('loginAvatarHero');
+    if (hero) {
+      hero.style.backgroundImage = `url('${data.avatar}')`;
+      hero.style.backgroundSize = 'cover';
+      hero.style.backgroundPosition = 'center';
     }
-    avatarImage.src = data.avatar;
-    avatarImage.alt = data.name;
     avatarFallback.style.display = 'none';
     avatarName.textContent = data.name;
     avatarHint.textContent = 'Email reconnu — entrez votre mot de passe pour vous connecter.';

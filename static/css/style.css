@@ -305,10 +305,10 @@ footer {
   position: relative;
   background: var(--accent);
   color: white;
-  padding: 3rem;
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   overflow: hidden;
 }
 
@@ -379,45 +379,57 @@ footer {
   background: rgba(255,255,255,0.12);
   color: white;
 }
-.auth-aside-preview .avatar-info {
-  min-width: 0;
-}
-.auth-aside-preview .avatar-info strong {
-  display: block;
-  color: white;
-  font-size: 1.15rem;
-  line-height: 1.2;
-  margin-bottom: 0.25rem;
-}
-.auth-aside-preview .avatar-info small {
-  color: rgba(255,255,255,0.75);
+.auth-aside-hero {
+  width: 100%;
+  height: calc(100vh - 8rem);
+  max-height: 72vh;
+  border-radius: 1rem;
+  overflow: hidden;
+  position: relative;
+  margin: 1rem 0 1.5rem 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.05));
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
 }
 
-.auth-form-wrapper {
+.auth-aside-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.12) 40%, rgba(0,0,0,0.45) 100%);
+  pointer-events: none;
+}
+
+.hero-avatar-fallback {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
   display: grid;
   place-items: center;
-  padding: 3rem 2rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  font-size: 1.6rem;
+  border-radius: 0.8rem;
+  background: rgba(255,255,255,0.08);
+  z-index: 2;
 }
 
-.auth-form-inner {
-  width: 100%;
-  max-width: 28rem;
+.hero-caption {
+  position: relative;
+  z-index: 3;
+  padding: 1.25rem;
+  color: white;
+}
+.hero-caption strong {
+  display: block;
+  font-size: 1.55rem;
+  margin-bottom: 0.25rem;
+}
+.hero-caption small {
+  color: rgba(255,255,255,0.9);
 }
 
-.auth-form-inner h1 { font-size: 2.25rem; margin-bottom: 0.5rem; }
-.text-muted { color: var(--text-muted); margin-bottom: 2rem; }
-
-/* Formulaires */
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-}
-.form-group { display: flex; flex-direction: column; gap: 0.4rem; }
-.form-group.full { grid-column: 1 / -1; }
-
-.form-group label {
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--text);
