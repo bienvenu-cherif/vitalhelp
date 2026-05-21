@@ -1,9 +1,13 @@
 # routes/auth.py
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+import os
+from hashlib import md5
+
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, current_app
 from flask_login import login_user, logout_user, login_required, current_user
 from extensions import db
 from models import User
 from forms import InscriptionForm, ConnexionForm, ProfilForm
+from werkzeug.utils import secure_filename
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -16,6 +20,19 @@ def inscription():
 
     form = InscriptionForm()
     if form.validate_on_submit():
+        avatar_url = None
+        avatar_file = form.avatar.data
+        if avatar_file and getattr(avatar_file, 'filename', None):
+            filename = secure_filename(avatar_file.filename)
+            if filename:
+                ext = filename.rsplit('.', 1)[-1].lower()
+                unique_name = f"{md5((form.email.data.lower().strip() + filename).encode('utf-8')).hexdigest()}.{ext}"
+                upload_folder = current_app.config["UPLOAD_FOLDER"]
+                os.makedirs(upload_folder, exist_ok=True)
+                avatar_path = os.path.join(upload_folder, unique_name)
+                avatar_file.save(avatar_path)
+                avatar_url = url_for("static", filename=f"uploads/avatars/{unique_name}")
+
         # 1. Créer l'utilisateur
         user = User(
             nom=form.nom.data.strip(),
@@ -23,6 +40,7 @@ def inscription():
             age=form.age.data,
             taille_cm=form.taille_cm.data,
             sexe=form.sexe.data,
+            avatar_url=avatar_url,
         )
         # 2. Hasher le mot de passe (jamais en clair !)
         user.set_password(form.password.data)
@@ -56,12 +74,45 @@ def connexion():
     return render_template("auth/connexion.html", form=form)
 
 
+@auth_bp.route("/avatar")
+def avatar():
+    email = request.args.get("email", "", type=str).lower().strip()
+    if not email:
+        return jsonify(found=False)
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify(found=False)
+
+    gravatar_hash = md5(user.email.encode("utf-8")).hexdigest()
+    avatar_url = getattr(user, "avatar_url", None) or f"https://www.gravatar.com/avatar/{gravatar_hash}?d=identicon&s=280"
+    return jsonify(found=True, name=user.nom, avatar=avatar_url)
+
+
 @auth_bp.route("/deconnexion")
 @login_required
 def deconnexion():
     logout_user()
     flash("Vous êtes déconnecté.", "info")
     return redirect(url_for("main.accueil"))
+
+
+def save_avatar_file(file_storage, identifier):
+    if not file_storage or not getattr(file_storage, "filename", None):
+        return None
+
+    filename = secure_filename(file_storage.filename)
+    if not filename:
+        return None
+
+    ext = filename.rsplit('.', 1)[-1].lower()
+    unique_name = f"{md5((identifier + filename).encode('utf-8')).hexdigest()}.{ext}"
+    upload_folder = current_app.config["UPLOAD_FOLDER"]
+    os.makedirs(upload_folder, exist_ok=True)
+    avatar_path = os.path.join(upload_folder, unique_name)
+    file_storage.save(avatar_path)
+    return url_for("static", filename=f"uploads/avatars/{unique_name}")
+
 
 @auth_bp.route("/profil", methods=["GET", "POST"])
 @login_required
@@ -72,6 +123,18 @@ def profil():
         current_user.age = form.age.data
         current_user.taille_cm = form.taille_cm.data
         current_user.sexe = form.sexe.data
+
+        avatar_file = form.avatar.data
+        if avatar_file and getattr(avatar_file, 'filename', None):
+            if current_user.avatar_url and current_user.avatar_url.startswith('/static/uploads/avatars/'):
+                old_avatar_path = os.path.join(current_app.root_path, current_user.avatar_url.lstrip('/'))
+                if os.path.exists(old_avatar_path):
+                    try:
+                        os.remove(old_avatar_path)
+                    except OSError:
+                        pass
+            current_user.avatar_url = save_avatar_file(avatar_file, current_user.email.lower().strip())
+
         db.session.commit()
         flash("✅ Profil mis à jour.", "success")
         return redirect(url_for("auth.profil"))

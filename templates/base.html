@@ -24,7 +24,11 @@
         <a href="{{ url_for('analyse.index') }}" class="btn btn-ghost">🧠 Analyse </a>
         <a href="{{ url_for('partage.liste') }}" class="btn btn-ghost">🔗 Partage</a>
         <a href="{{ url_for('auth.profil') }}" class="user-chip" title="Mon profil">
-          <span class="avatar-small">{{ current_user.nom[0]|upper }}</span>
+          {% if current_user.avatar_url %}
+            <img src="{{ current_user.avatar_url }}" alt="{{ current_user.nom }}" class="avatar-small" />
+          {% else %}
+            <span class="avatar-small">{{ current_user.nom[0]|upper }}</span>
+          {% endif %}
           {{ current_user.nom.split()[0] }}
         </a>
         <a href="{{ url_for('auth.deconnexion') }}" class="btn btn-outline">Déconnexion</a>

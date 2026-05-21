@@ -5,6 +5,13 @@
 <div class="auth-shell">
   <aside class="auth-aside">
     <a href="{{ url_for('main.accueil') }}" class="back-link">← Retour à l'accueil</a>
+    <div class="auth-aside-preview" id="loginAvatarPreview">
+      <div class="avatar-preview avatar-fallback" id="loginAvatarFallback">🩺</div>
+      <div class="avatar-info">
+        <strong id="loginAvatarName">Bon retour parmi nous.</strong>
+        <small id="loginAvatarHint">Commencez à saisir votre email pour retrouver votre profil.</small>
+      </div>
+    </div>
     <div>
       <div class="logo-big">🩺</div>
       <h2>Bon retour parmi nous.</h2>
@@ -39,4 +46,65 @@
     </div>
   </div>
 </div>
+{% block scripts %}
+<script>
+  const emailInput = document.querySelector('input[name="email"]');
+  const avatarPreview = document.getElementById('loginAvatarPreview');
+  const avatarFallback = document.getElementById('loginAvatarFallback');
+  const avatarName = document.getElementById('loginAvatarName');
+  const avatarHint = document.getElementById('loginAvatarHint');
+  let avatarImage = null;
+  let debounceId = null;
+
+  function resetPreview() {
+    if (avatarImage) {
+      avatarImage.remove();
+      avatarImage = null;
+    }
+    avatarFallback.textContent = '🩺';
+    avatarFallback.style.display = 'grid';
+    avatarName.textContent = 'Bon retour parmi nous.';
+    avatarHint.textContent = 'Commencez à saisir votre email pour retrouver votre profil.';
+  }
+
+  function showUserPreview(data) {
+    if (!avatarImage) {
+      avatarImage = document.createElement('img');
+      avatarImage.className = 'avatar-preview';
+      avatarPreview.insertBefore(avatarImage, avatarFallback);
+    }
+    avatarImage.src = data.avatar;
+    avatarImage.alt = data.name;
+    avatarFallback.style.display = 'none';
+    avatarName.textContent = data.name;
+    avatarHint.textContent = 'Email reconnu — entrez votre mot de passe pour vous connecter.';
+  }
+
+  function fetchAvatar(email) {
+    if (!email) {
+      resetPreview();
+      return;
+    }
+
+    fetch(`{{ url_for('auth.avatar') }}?email=${encodeURIComponent(email)}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.found) {
+          showUserPreview(data);
+        } else {
+          resetPreview();
+        }
+      })
+      .catch(() => {
+        resetPreview();
+      });
+  }
+
+  if (emailInput) {
+    emailInput.addEventListener('input', () => {
+      clearTimeout(debounceId);
+      debounceId = setTimeout(() => fetchAvatar(emailInput.value.trim()), 250);
+    });
+  }
+</script>
 {% endblock %}

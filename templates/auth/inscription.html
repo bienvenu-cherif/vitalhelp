@@ -18,7 +18,7 @@
       <h1>Créer votre journal</h1>
       <p class="text-muted">Quelques secondes pour commencer.</p>
 
-      <form method="POST" novalidate>
+      <form method="POST" enctype="multipart/form-data" novalidate>
         {{ form.hidden_tag() }}
 
         <div class="form-row">
@@ -41,6 +41,11 @@
             {{ form.password_confirm.label }}
             {{ form.password_confirm(class="input") }}
             {% for e in form.password_confirm.errors %}<span class="error">{{ e }}</span>{% endfor %}
+          </div>
+          <div class="form-group full">
+            {{ form.avatar.label }}
+            {{ form.avatar(class="input") }}
+            {% for e in form.avatar.errors %}<span class="error">{{ e }}</span>{% endfor %}
           </div>
           <div class="form-group">
             {{ form.age.label }}

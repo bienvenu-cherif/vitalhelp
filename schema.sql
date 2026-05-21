@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
     age             INTEGER NOT NULL CHECK (age >= 0 AND age <= 150),
     taille_cm       INTEGER NOT NULL CHECK (taille_cm >= 40 AND taille_cm <= 300),
     sexe            VARCHAR(10) NOT NULL CHECK (sexe IN ('homme', 'femme')),
+    avatar_url      VARCHAR(255),
     created_at      TIMESTAMP NOT NULL DEFAULT NOW()
 );
 

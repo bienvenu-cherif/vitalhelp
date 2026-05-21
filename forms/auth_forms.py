@@ -1,7 +1,8 @@
 # forms/auth_forms.py
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileAllowed, FileField
 from wtforms import StringField, PasswordField, IntegerField, SelectField, SubmitField
-from wtforms.validators import DataRequired, Email, Length, EqualTo, NumberRange, ValidationError
+from wtforms.validators import DataRequired, Email, Length, EqualTo, NumberRange, ValidationError, Optional
 from models import User
 
 
@@ -23,6 +24,9 @@ class InscriptionForm(FlaskForm):
     password_confirm = PasswordField("Confirmer le mot de passe", validators=[
         DataRequired(),
         EqualTo("password", message="Les mots de passe ne correspondent pas")
+    ])
+    avatar = FileField("Photo de profil (optionnelle)", validators=[
+        FileAllowed(["jpg", "jpeg", "png", "gif"], "Images seulement")
     ])
     age = IntegerField("Âge", validators=[
         DataRequired(),
@@ -51,6 +55,9 @@ class ConnexionForm(FlaskForm):
 class ProfilForm(FlaskForm):
     """Édition du profil utilisateur"""
     nom = StringField("Nom complet", validators=[DataRequired(), Length(min=2, max=100)])
+    avatar = FileField("Changer la photo de profil", validators=[
+        FileAllowed(["jpg", "jpeg", "png", "gif"], "Images seulement")
+    ])
     age = IntegerField("Âge", validators=[DataRequired(), NumberRange(min=0, max=150)])
     taille_cm = IntegerField("Taille (cm)", validators=[DataRequired(), NumberRange(min=40, max=300)])
     sexe = SelectField("Sexe", choices=[("homme", "Homme"), ("femme", "Femme")],

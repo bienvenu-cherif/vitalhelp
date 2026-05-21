@@ -1,9 +1,11 @@
 # app.py — VitalHelp
+import os
 from flask import Flask
 from config import Config
 from extensions import db, login_manager, bcrypt
 from routes import main_bp, auth_bp, mesures_bp, objectifs_bp, donnees_bp, analyse_bp, partage_bp, public_bp
 from flask_wtf.csrf import generate_csrf
+from sqlalchemy import text
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 
@@ -16,6 +18,7 @@ def create_app():
     db.init_app(app)
     login_manager.init_app(app)
     bcrypt.init_app(app)
+    os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
@@ -34,6 +37,19 @@ def create_app():
     with app.app_context():
         from models import User, Mesure, Objectif, AnalyseIA, LienPartage
         db.create_all()
+        from sqlalchemy import inspect
+        inspector = inspect(db.engine)
+        if "users" in inspector.get_table_names():
+            columns = [col["name"] for col in inspector.get_columns("users")]
+            if "avatar_url" not in columns:
+                try:
+                    if db.engine.dialect.name == "sqlite":
+                        db.session.execute(text("ALTER TABLE users ADD COLUMN avatar_url VARCHAR(255)"))
+                    else:
+                        db.session.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url VARCHAR(255)"))
+                    db.session.commit()
+                except Exception:
+                    db.session.rollback()
         # Handlers d'erreurs personnalisés
         from flask import render_template
 

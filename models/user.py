@@ -24,6 +24,7 @@ class User(db.Model, UserMixin):
     age = db.Column(db.Integer, nullable=False)
     taille_cm = db.Column(db.Integer, nullable=False)
     sexe = db.Column(db.String(10), nullable=False)
+    avatar_url = db.Column(db.String(255), nullable=True)
 
     # --- Métadonnées ---
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
