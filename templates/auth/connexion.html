@@ -7,6 +7,7 @@
     <a href="{{ url_for('main.accueil') }}" class="back-link">← Retour à l'accueil</a>
 
     <div class="auth-aside-hero" id="loginAvatarHero">
+      <img id="loginAvatarImage" class="hero-avatar-image" alt="Photo de profil" aria-hidden="true" />
       <div class="hero-avatar-fallback" id="loginAvatarFallback">🩺</div>
       <div class="hero-caption">
         <strong id="loginAvatarName">Bon retour parmi nous.</strong>
@@ -47,22 +48,16 @@
 {% block scripts %}
 <script>
   const emailInput = document.querySelector('input[name="email"]');
-  const avatarPreview = document.getElementById('loginAvatarPreview');
+  const avatarImage = document.getElementById('loginAvatarImage');
   const avatarFallback = document.getElementById('loginAvatarFallback');
   const avatarName = document.getElementById('loginAvatarName');
   const avatarHint = document.getElementById('loginAvatarHint');
-  let avatarImage = null;
   let debounceId = null;
 
   function resetPreview() {
     if (avatarImage) {
-      avatarImage.remove();
-      avatarImage = null;
-    }
-    // reset hero background
-    const hero = document.getElementById('loginAvatarHero');
-    if (hero) {
-      hero.style.backgroundImage = '';
+      avatarImage.src = '';
+      avatarImage.style.display = 'none';
     }
     avatarFallback.textContent = '🩺';
     avatarFallback.style.display = 'grid';
@@ -71,12 +66,9 @@
   }
 
   function showUserPreview(data) {
-    // set large hero background image
-    const hero = document.getElementById('loginAvatarHero');
-    if (hero) {
-      hero.style.backgroundImage = `url('${data.avatar}')`;
-      hero.style.backgroundSize = 'cover';
-      hero.style.backgroundPosition = 'center';
+    if (avatarImage) {
+      avatarImage.src = data.avatar;
+      avatarImage.style.display = 'block';
     }
     avatarFallback.style.display = 'none';
     avatarName.textContent = data.name;
